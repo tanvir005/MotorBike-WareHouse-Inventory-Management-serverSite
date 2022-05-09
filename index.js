@@ -71,7 +71,7 @@ async function run() {
         });
 
         // my items
-        app.get('/invenrotyitems', async (req, res) => {
+        app.get('/invenrotyitemsQ', async (req, res) => {
             const email = req.query.email;
             const query = { email: email };
             const cursor = inventoryItemsCollections.find(query);
