@@ -22,17 +22,52 @@ async function run() {
         await client.connect();
         const inventoryItemsCollections = client.db('warehouse-inventor-management').collection('invenrotyitems');
 
+        // adding items 
         app.post('/invenrotyitems', async (req, res) => {
             const doc = req.body;
             const result = await inventoryItemsCollections.insertOne(doc);
             res.send(result);
         });
 
+
+        // get all items 
         app.get('/invenrotyitems', async (req, res) => {
             const query = {};
             const cursor = inventoryItemsCollections.find(query);
             const services = await cursor.toArray();
             res.send(services);
+        });
+
+
+        // get an items using id 
+        app.get('/invenrotyitems/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const item = await inventoryItemsCollections.findOne(query);
+            res.send(item);
+        });
+
+        // update a item
+        app.put('/invenrotyitems/:id', async (req, res) => {
+            const id = req.params.id;
+            const updatedItem = req.body;
+            const filter = { _id: ObjectId(id) };
+            const options = { upsert: true };
+            const updatedDoc = {
+                $set: {
+                    quantity: updatedItem.newQuantity
+                }
+            };
+            const updetedResult = await inventoryItemsCollections.updateOne(filter, updatedDoc, options);
+            res.send(updetedResult);
+        });
+
+        //delete items from manage inventory
+        app.delete('/invenrotyitems/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) }
+            const result = await inventoryItemsCollections.deleteOne(query);
+            res.send(result);
         });
 
     }
