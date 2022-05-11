@@ -137,9 +137,7 @@ run().catch(console.dir)
 app.get('/', (req, res) => {
     res.send('server running');
 });
-app.get('/check', (req, res) => {
-    res.send('CHecked Successed');
-});
+
 
 app.listen(port, () => {
     console.log('listining to port:', port);
