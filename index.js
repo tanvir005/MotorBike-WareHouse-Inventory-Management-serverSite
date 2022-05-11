@@ -1,6 +1,7 @@
 const express = require('express');
 const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require('cors');
+const jwt = require('jsonwebtoken');
 require('dotenv').config();
 const port = process.env.PORT || 5000;
 
@@ -11,6 +12,27 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// verifing jwt 
+
+function varifyJWT(req, res, next) {
+    console.log('start here:', req.body, res.body, next);
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+        return res.status(401).send({ message: 'Unauthorized access' })
+    }
+    const token = authHeader.split(' ')[1];
+    console.log(token);
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
+        console.log(err, decoded);
+        if (err) {
+            return res.status(403).send({ message: 'Forbiden access.' })
+        }
+
+        req.decoded = decoded;
+    })
+
+    next();
+}
 
 
 
@@ -21,6 +43,18 @@ async function run() {
     try {
         await client.connect();
         const inventoryItemsCollections = client.db('warehouse-inventor-management').collection('invenrotyitems');
+
+        //auth 
+        app.post('/login', async (req, res) => {
+            const user = req.body;
+            console.log(user);
+            const accessToken = jwt.sign(user, process.env.ACCESS_TOKEN, {
+                expiresIn: '1h'
+            });
+
+            res.send({ accessToken });
+        });
+
 
         // adding items 
         app.post('/invenrotyitems', async (req, res) => {
@@ -71,12 +105,25 @@ async function run() {
         });
 
         // my items
-        app.get('/invenrotyitemsQ', async (req, res) => {
+        app.get('/invenrotyitemsQ', varifyJWT, async (req, res) => {
+            const decodedEmail = req.decoded.email;
+            console.log(decodedEmail);
             const email = req.query.email;
-            const query = { email: email };
-            const cursor = inventoryItemsCollections.find(query);
-            const services = await cursor.toArray();
-            res.send(services);
+            // 
+            // const query = { email: email };
+            // const cursor = inventoryItemsCollections.find(query);
+            // const services = await cursor.toArray();
+            // res.send(services);
+
+            if (decodedEmail === email) {
+                const query = { email: email };
+                const cursor = inventoryItemsCollections.find(query);
+                const services = await cursor.toArray();
+                res.send(services);
+            }
+            else {
+                res.status(403).send({ message: 'Forbidden access' })
+            }
         });
 
     }
