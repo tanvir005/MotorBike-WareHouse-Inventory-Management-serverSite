@@ -137,6 +137,9 @@ run().catch(console.dir)
 app.get('/', (req, res) => {
     res.send('server running');
 });
+app.get('/check', (req, res) => {
+    res.send('Checkimg: server running');
+});
 
 
 app.listen(port, () => {
