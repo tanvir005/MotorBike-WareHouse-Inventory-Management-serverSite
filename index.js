@@ -7,11 +7,11 @@ const port = process.env.PORT || 5000;
 
 const app = express();
 
-// const corsOptions = {
-//     origin: "http://localhost:5000/", //"https://warehouse-inventory-mana-7580c.web.app/",
-//   };
+const corsOptions = {
+    origin: "https://warehouse-inventory-mana-7580c.web.app/",
+  };
 // middle ware 
-app.use(cors());
+app.use(cors(corsOptions));
 app.use(express.json());
 
 // verifing jwt 
