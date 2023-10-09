@@ -67,6 +67,14 @@ async function run() {
 
 
         // get all items 
+        app.get('/invenrotyitemss', async (req, res) => {
+            const cursor = ['hi','hello'];
+            // const services = await cursor.toArray();
+            res.send(cursor);
+        });
+
+
+        // get all items 
         app.get('/invenrotyitems', async (req, res) => {
             const query = {};
             const cursor = inventoryItemsCollections.find(query);
@@ -140,7 +148,7 @@ app.get('/', (req, res) => {
     res.send('server running');
 });
 app.get('/check', (req, res) => {
-    res.send('Checkimg: server running');
+    res.send('Checking: server running');
 });
 
 
